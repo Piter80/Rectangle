@@ -68,7 +68,8 @@ public class Rectangle {
         //if file writed in OS Windows and started with BOM symbol
         Character bom = 65279;
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("C:\\IdeaProjects\\rectangle\\src\\main\\resources\\coords.txt")));
+            //BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("C:\\IdeaProjects\\rectangle\\src\\main\\resources\\coords.txt")));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(this.file)));
             int count = 0;
             while (reader.ready()) {
                 String[] str = reader.readLine().replace(bom, ' ').trim().split(" ");

@@ -1,22 +1,24 @@
-
+import java.awt.*;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.*;
-import java.util.*;
 
 
 public class Rectangle {
     private File file;
-    private int[] coordsOfPoint = new int[2];
-    private int[][] rectangleCoords = new int[4][2];
+    private Double[] coordsOfPoint = new Double[2];
+    private Double[][] rectangleCoords = new Double[4][2];
 
     public static void main(String[] args) {
         Rectangle rectangle = new Rectangle();
-        /*System.out.println(Arrays.deepToString(rectangle.rectangleCoords));
-        System.out.println(Arrays.toString(rectangle.coordsOfPoint));*/
     }
 
     public Rectangle() {
         readData();
         analyzePoint();
+
+
     }
 
 
@@ -27,44 +29,49 @@ public class Rectangle {
     }
 
     private void analyzePoint() {
+        Point2D leftUp = new Point2D.Double(rectangleCoords[0][0], rectangleCoords[0][1]);
+        Point2D rightUp = new Point2D.Double(rectangleCoords[1][0], rectangleCoords[1][1]);
+        Point2D rightDown = new Point2D.Double(rectangleCoords[2][0], rectangleCoords[2][1]);
+        Point2D leftDown = new Point2D.Double(rectangleCoords[3][0], rectangleCoords[3][1]);
 
-        if (Arrays.equals(coordsOfPoint, rectangleCoords[0]) ||
-                Arrays.equals(coordsOfPoint, rectangleCoords[1]) ||
-                Arrays.equals(coordsOfPoint, rectangleCoords[2]) ||
-                Arrays.equals(coordsOfPoint, rectangleCoords[3])) {
+        Polygon polygon = new Polygon();
+        polygon.addPoint(rectangleCoords[0][0].intValue(), rectangleCoords[0][1].intValue());
+        polygon.addPoint(rectangleCoords[1][0].intValue(), rectangleCoords[1][1].intValue());
+        polygon.addPoint(rectangleCoords[2][0].intValue(), rectangleCoords[2][1].intValue());
+        polygon.addPoint(rectangleCoords[3][0].intValue(), rectangleCoords[3][1].intValue());
+
+        Point2D.Double userPoint = new Point2D.Double(coordsOfPoint[0], coordsOfPoint[1]);
+
+        Line2D lineUp = new Line2D.Double(leftUp, rightUp);
+        Line2D lineRight = new Line2D.Double(rightUp, rightDown);
+        Line2D lineDown = new Line2D.Double(rightDown, leftDown);
+        Line2D lineLeft = new Line2D.Double(leftDown, leftUp);
+
+        if (userPoint.equals(leftUp) ||
+                userPoint.equals(rightUp) ||
+                userPoint.equals(rightDown) ||
+                userPoint.equals(leftDown)) {
             System.out.println("The point - vertex of the rectangle");
             return;
         }
 
-        if( ((coordsOfPoint[0] >= rectangleCoords[0][0] && coordsOfPoint[0] <= rectangleCoords[1][0] && coordsOfPoint[1] == rectangleCoords[0][1] ))) {
-            System.out.println("The point on UPPER line of rectangle");
+        if (lineUp.intersects(userPoint.x, userPoint.y, 1,1) ||
+                lineDown.intersects(userPoint.x, userPoint.y, 1,1) ||
+                lineRight.intersects(userPoint.x, userPoint.y, 1,1) ||
+                lineLeft.intersects(userPoint.x, userPoint.y, 1,1)) {
+            System.out.println("The point on line(edge) of rectangle");
             return;
         }
 
-        if( ((coordsOfPoint[0] >= rectangleCoords[0][0] && coordsOfPoint[0] <= rectangleCoords[1][0] && coordsOfPoint[1] == rectangleCoords[3][1] ))) {
-            System.out.println("The point on DOWN line of rectangle");
-            return;
-        }
-        if( ((coordsOfPoint[1] <= rectangleCoords[0][1] && coordsOfPoint[1] >= rectangleCoords[3][1] && coordsOfPoint[0] == rectangleCoords[0][0] ))) {
-            System.out.println("The point on LEFT line of rectangle");
-            return;
-        }
-        if( ((coordsOfPoint[1] <= rectangleCoords[1][1] && coordsOfPoint[1] >= rectangleCoords[2][1] && coordsOfPoint[0] == rectangleCoords[2][0] ))) {
-            System.out.println("The point on RIGHT line of rectangle");
-            return;
-        }
-
-
-        if( ((coordsOfPoint[0] > rectangleCoords[0][0] && coordsOfPoint[0] < rectangleCoords[1][0]))
-        && (coordsOfPoint[1] < rectangleCoords[0][1] && coordsOfPoint[1] > rectangleCoords[3][1])) {
+        if (polygon.contains(userPoint)) {
             System.out.println("The point inside of the rectangle");
             return;
         }
         else System.out.println("The point NOT inside of the rectangle");
     }
 
-    private int[][] getNumbersFromFile() {
-        int[][] rectangleCoords = new int[4][2];
+    private Double[][] getNumbersFromFile() {
+        Double[][] rectangleCoords = new Double[4][2];
         //if file writed in OS Windows and started with BOM symbol
         Character bom = 65279;
         try {
@@ -73,8 +80,8 @@ public class Rectangle {
             int count = 0;
             while (reader.ready()) {
                 String[] str = reader.readLine().replace(bom, ' ').trim().split(" ");
-                rectangleCoords[count][0] = Integer.valueOf(str[0]);
-                rectangleCoords[count][1] = Integer.valueOf(str[1]);
+                rectangleCoords[count][0] = Double.valueOf(str[0]);
+                rectangleCoords[count][1] = Double.valueOf(str[1]);
                 count++;
             }
         } catch (IOException e) {
@@ -85,15 +92,15 @@ public class Rectangle {
 
     }
 
-    private int[] getCoordinates() {
-        int[] coords = new int[2];
+    private Double[] getCoordinates() {
+        Double[] coords = new Double[2];
         System.out.println("Please enter coordinates for point to analyze. Use space as separator: ");
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         try {
             String[] str = reader.readLine().split(" ");
             if (str.length > 2) throw new IOException("Wrong input for coordinates point");
-            coords[0] = Integer.parseInt(str[0]);
-            coords[1] = Integer.parseInt(str[1]);
+            coords[0] = Double.valueOf(str[0]);
+            coords[1] = Double.valueOf(str[1]);
         } catch (IOException e) {
             System.out.println("Error, when reading coordinates. Maybe you write something illegal in console.\n");
             e.printStackTrace();
